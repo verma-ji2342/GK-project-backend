@@ -4,10 +4,9 @@ Schemas
 
 from drf_yasg import openapi
 
-request_body_schema = openapi.Schema(
+request_body_put_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID'),
         'name': openapi.Schema(type=openapi.TYPE_STRING, description='Name'),
         'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
         'age': openapi.Schema(type=openapi.TYPE_INTEGER, description='Age'),
@@ -26,5 +25,5 @@ request_body_schema = openapi.Schema(
             }
         )
     },
-    required=['id', 'name', 'email', 'age', 'pincode', 'department', 'address', 'state']
+    required=['name', 'email', 'age', 'pincode', 'department', 'address', 'state']
 )

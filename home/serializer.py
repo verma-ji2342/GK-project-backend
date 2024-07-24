@@ -7,7 +7,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ["dept_name"]
+        fields = '__all__'
 
     def validate_dept_name(self, dept_name):
         if not Department.objects.filter(dept_name=dept_name).exists():
@@ -20,17 +20,16 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
-        fields = ["state"]
+        fields = '__all__'
 
     def validate_state(self, state):
         if not state.objects.filter(state=state).exists():
             raise serializers.ValidationError(
                 {"message": "State is invalid", "status": False}
             )
-            return None
         return state
 
-
+     
 class PeopleSerializer(serializers.ModelSerializer):
 
     country = serializers.SerializerMethodField()
@@ -39,18 +38,9 @@ class PeopleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = [
-            "id",
-            "name",
-            "email",
-            "age",
-            "pincode",
-            "department",
-            "address",
-            "state",
-            "country",
-        ]
+        fields = '__all__'
         depth = 1
+
 
     def validate_age(self, age):
         if age < 18:
@@ -59,7 +49,7 @@ class PeopleSerializer(serializers.ModelSerializer):
         return age
 
     def validate_name(self, name):
-        specialcharacter = "!@#$%%^&*(:)"
+        specialcharacter = "!@#$%+_-/><;';[]{\}^&*(:)"
         if any(c in specialcharacter for c in name):
             raise serializers.ValidationError(
                 "Name should not contain any special character"
@@ -80,6 +70,16 @@ class PeopleSerializer(serializers.ModelSerializer):
                     {"email": "Email is already registered by another user", "satus": False}
                 )
         return email
+    
+    # def validate_department(self, data):
+    #     k = data.keys()
+    #     if "state" not in k and "department" not in k:
+    #         raise serializers.ValidationError("State and department are required")
+    #     elif "state" not in k:
+    #         raise serializers.ValidationError("State is required")
+    #     elif "department" not in k:
+    #         raise serializers.ValidationError("department is required")
+    #     return data
 
 
 class LoginSerializer(serializers.Serializer):
@@ -122,7 +122,6 @@ class RegisterSerializer(serializers.Serializer):
         user.save()
         # you can use
         # user.set_password(validated_data['password'])
-        print(validated_data)
         return validated_data
 
 
