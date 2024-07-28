@@ -16,7 +16,7 @@ class Department(models.Model):
 
 
 class State(models.Model):
-    """"
+    """ "
     State Tables
     """
 
@@ -24,6 +24,19 @@ class State(models.Model):
 
     def __str__(self):
         return f"State Name - {self.state}"
+
+
+class Project(models.Model):
+    """
+    About Project description
+    """
+
+    name = models.CharField(max_length=50)
+    company = models.CharField(max_length=100)
+    
+
+    def __str__(self):
+        return f"Project - {self.name}"
 
 
 class Person(models.Model):
@@ -51,5 +64,25 @@ class Person(models.Model):
         blank=True,
     )
 
+    project = models.ManyToManyField(Project, related_name="child_three")
+
     def __str__(self):
         return f"Person - {self.name}"
+
+
+
+class Account(models.Model):
+    """
+    About Salary
+    """
+
+    person = models.OneToOneField(
+        Person, on_delete=models.CASCADE, related_name="Account", unique=True
+    )
+    balance = models.PositiveSmallIntegerField()
+    DoJ = models.DateField()
+
+    def __str__(self):
+        return self.person.name
+    
+    

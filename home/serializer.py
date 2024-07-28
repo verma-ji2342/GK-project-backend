@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Person, Department, State
+from .models import Person, Department, State, Project, Account
 from django.contrib.auth.models import User
 
 
@@ -28,6 +28,22 @@ class StateSerializer(serializers.ModelSerializer):
                 {"message": "State is invalid", "status": False}
             )
         return state
+    
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = "__all__"
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    person = serializers.SlugRelatedField(slug_field='id', queryset=Person.objects.all())
+    class Meta:
+        model = Account
+        fields = '__all__'
+        
+
+
 
      
 class PeopleSerializer(serializers.ModelSerializer):
@@ -35,6 +51,7 @@ class PeopleSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField()
     state = StateSerializer(read_only=True)
     department = DepartmentSerializer(read_only=True)
+    project = ProjectSerializer(read_only=True, many=True)
 
     class Meta:
         model = Person
@@ -49,7 +66,7 @@ class PeopleSerializer(serializers.ModelSerializer):
         return age
 
     def validate_name(self, name):
-        specialcharacter = "!@#$%+_-/><;';[]{\}^&*(:)"
+        specialcharacter = "!@#$%+_-/><;/';[]{\}^&*(:)"
         if any(c in specialcharacter for c in name):
             raise serializers.ValidationError(
                 "Name should not contain any special character"
@@ -59,6 +76,11 @@ class PeopleSerializer(serializers.ModelSerializer):
 
     def get_country(self, data):
         return "India"
+    
+    def get_account(self, data):
+        acount_obj = Account.objects.get("person" == data)
+        return "acount_obj"
+    
 
     def validate_email(self, email):
         request = self.context.get('request')
@@ -71,15 +93,12 @@ class PeopleSerializer(serializers.ModelSerializer):
                 )
         return email
     
-    # def validate_department(self, data):
-    #     k = data.keys()
-    #     if "state" not in k and "department" not in k:
-    #         raise serializers.ValidationError("State and department are required")
-    #     elif "state" not in k:
-    #         raise serializers.ValidationError("State is required")
-    #     elif "department" not in k:
-    #         raise serializers.ValidationError("department is required")
-    #     return data
+    def validate(self, data):
+        # Remove the age field from validation
+        data.pop('project', None)
+        return data
+    
+
 
 
 class LoginSerializer(serializers.Serializer):
